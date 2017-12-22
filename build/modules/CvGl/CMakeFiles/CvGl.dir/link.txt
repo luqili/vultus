@@ -1,0 +1,2 @@
+/usr/bin/ar qc libCvGl.a  CMakeFiles/CvGl.dir/FBRender.cpp.o
+/usr/bin/ranlib libCvGl.a

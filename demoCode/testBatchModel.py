@@ -125,12 +125,12 @@ with open(fileList, "r") as ins:
 #####CNN fitting ############################## 
 
 # load net
-try: 
-	caffe.set_mode_gpu()
-	caffe.set_device(GPU_ID)
-except Exception as ex:
-	print '> Could not setup Caffe in GPU ' +str(GPU_ID) + ' - Error: ' + ex
-	print '> Reverting into CPU mode'
+#try: 
+#	caffe.set_mode_gpu()
+#	caffe.set_device(GPU_ID)
+#except Exception as ex:
+#	print '> Could not setup Caffe in GPU ' +str(GPU_ID) + ' - Error: ' + ex
+#	print '> Reverting into CPU mode'
 	caffe.set_mode_cpu()
 ## Opening mean average image
 proto_data = open(mean_path, "rb").read()

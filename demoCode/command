@@ -1,0 +1,3 @@
+python testBatchModel.py input.txt out/
+ctmviewer out//demo3.ply
+

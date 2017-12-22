@@ -6,8 +6,8 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:\$ORIGIN/../bin:\$ORIGIN")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 
 # DEFINE PATH TO YOUR THIRD PARTY LIBs
-set (DLIB_INCLUDE_DIR "/home/anh/Downloads/dlib-19.4")
-set (DLIB_LIB_DIR "/home/anh/Downloads/dlib-19.4/shared_build/dlib")
+set (DLIB_INCLUDE_DIR "/home/ece496/Downloads/dlib-19.8/")
+set (DLIB_LIB_DIR "/home/ece496/Downloads/dlib-19.8/build/dlib/")
 
 # OpenCV
 if(UNIX)

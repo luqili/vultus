@@ -1,0 +1,2 @@
+/usr/bin/ar qc libPoseExprLib.a  CMakeFiles/PoseExprLib.dir/src/utility.cpp.o CMakeFiles/PoseExprLib.dir/src/epnp.cpp.o CMakeFiles/PoseExprLib.dir/src/BaselFace.cpp.o CMakeFiles/PoseExprLib.dir/src/BaselFaceEstimator.cpp.o CMakeFiles/PoseExprLib.dir/src/FTModel.cpp.o CMakeFiles/PoseExprLib.dir/src/FImRenderer.cpp.o CMakeFiles/PoseExprLib.dir/src/RenderModel.cpp.o CMakeFiles/PoseExprLib.dir/src/FaceServices2.cpp.o CMakeFiles/PoseExprLib.dir/src/DlibWrapper.cpp.o
+/usr/bin/ranlib libPoseExprLib.a
