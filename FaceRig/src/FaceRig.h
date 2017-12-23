@@ -15,7 +15,8 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
-#include <GL/glut.h>
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 
 
 #include "tinyply.h"
@@ -35,7 +36,7 @@ inline double difference_micros(timepoint start, timepoint end)
 	return (double)std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 }
 
-class VAO{
+class Model{
 public:
 	std::vector<float> verts;
 	std::vector<float> norms;
@@ -43,12 +44,21 @@ public:
 
 	std::vector<uint32_t> faces;
 	std::vector<float> uvCoords;
+
+	GLuint	m_posVBO = 0;
+	GLuint	m_norVBO = 0;
+	GLuint	m_colorVBO = 0;
+	GLuint	m_ibo = 0;
+	GLenum	m_indexType;
+
+	GLuint	m_VAO = 0;
 };
 
-void read_ply_file(const std::string & filename, VAO* pVAO);
-void display(VAO* pVAO);
+void read_ply_file(const std::string & filename, Model* pModel);
+void display(Model* pModel);
+void Initialize_VAO(Model* pModel);
 
-
-
+GLuint	m_posVBO;
+GLuint	m_colorVBO;
 
 #endif /* FACERIG_H_ */

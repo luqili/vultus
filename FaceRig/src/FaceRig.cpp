@@ -13,16 +13,17 @@ using namespace tinyply;
 
 int main() {
 	cout << "start reading ply file" << endl; // prints !!!Hello World!!!
-	VAO* pVAO = new VAO();
-	read_ply_file("demo1.ply", pVAO);
+	Model* pModel = new Model();
+	read_ply_file("demo1.ply", pModel);
 	cout << "read complete" << endl;
-	display(pVAO);
+	display(pModel);
 	cout << "display complete" << endl;
+	delete pModel;
 	return 0;
 }
 
 
-void read_ply_file(const std::string & filename, VAO* pVAO)
+void read_ply_file(const std::string & filename, Model* pModel)
 {
 	// Tinyply can and will throw exceptions at you!
 	try
@@ -65,16 +66,16 @@ void read_ply_file(const std::string & filename, VAO* pVAO)
 		// The count returns the number of instances of the property group. The vectors
 		// above will be resized into a multiple of the property group size as
 		// they are "flattened"... i.e. verts = {x, y, z, x, y, z, ...}
-		vertexCount = file.request_properties_from_element("vertex", { "x", "y", "z" }, pVAO->verts);
-		normalCount = file.request_properties_from_element("vertex", { "nx", "ny", "nz" }, pVAO->norms);
-		colorCount = file.request_properties_from_element("vertex", { "red", "green", "blue", "alpha" }, pVAO->colors);
+		vertexCount = file.request_properties_from_element("vertex", { "x", "y", "z" }, pModel->verts);
+		normalCount = file.request_properties_from_element("vertex", { "nx", "ny", "nz" }, pModel->norms);
+		colorCount = file.request_properties_from_element("vertex", { "red", "green", "blue", "alpha" }, pModel->colors);
 
 		// For properties that are list types, it is possibly to specify the expected count (ideal if a
 		// consumer of this library knows the layout of their format a-priori). Otherwise, tinyply
 		// defers allocation of memory until the first instance of the property has been found
 		// as implemented in file.read(ss)
-		faceCount = file.request_properties_from_element("face", { "vertex_indices" }, pVAO->faces, 3);
-		faceTexcoordCount = file.request_properties_from_element("face", { "texcoord" }, pVAO->uvCoords, 6);
+		faceCount = file.request_properties_from_element("face", { "vertex_indices" }, pModel->faces, 3);
+		faceTexcoordCount = file.request_properties_from_element("face", { "texcoord" }, pModel->uvCoords, 6);
 
 		// Now populate the vectors...
 		timepoint before = now();
@@ -83,11 +84,11 @@ void read_ply_file(const std::string & filename, VAO* pVAO)
 
 		// Good place to put a breakpoint!
 		std::cout << "Parsing took " << difference_micros(before, after) << "μs: " << std::endl;
-		std::cout << "\tRead " << pVAO->verts.size() << " total vertices (" << vertexCount << " properties)." << std::endl;
-		std::cout << "\tRead " << pVAO->norms.size() << " total normals (" << normalCount << " properties)." << std::endl;
-		std::cout << "\tRead " << pVAO->colors.size() << " total vertex colors (" << colorCount << " properties)." << std::endl;
-		std::cout << "\tRead " << pVAO->faces.size() << " total faces (triangles) (" << faceCount << " properties)." << std::endl;
-		std::cout << "\tRead " << pVAO->uvCoords.size() << " total texcoords (" << faceTexcoordCount << " properties)." << std::endl;
+		std::cout << "\tRead " << pModel->verts.size() << " total vertices (" << vertexCount << " properties)." << std::endl;
+		std::cout << "\tRead " << pModel->norms.size() << " total normals (" << normalCount << " properties)." << std::endl;
+		std::cout << "\tRead " << pModel->colors.size() << " total vertex colors (" << colorCount << " properties)." << std::endl;
+		std::cout << "\tRead " << pModel->faces.size() << " total faces (triangles) (" << faceCount << " properties)." << std::endl;
+		std::cout << "\tRead " << pModel->uvCoords.size() << " total texcoords (" << faceTexcoordCount << " properties)." << std::endl;
 
 		/*
 		// Fixme - tinyply isn't particularly sensitive to mismatched properties and prefers to crash instead of throw. Use
@@ -117,24 +118,46 @@ void read_ply_file(const std::string & filename, VAO* pVAO)
 	}
 }
 
-void display(VAO* pVAO){
+void display(Model* pModel){
 
+	glewInit();
 	char *argv [1];
 	int argc=1;
 	argv [0]=strdup ("FaceRig");
 	glutInit(&argc, argv);
+
 	glutInitDisplayMode(GLUT_SINGLE);
 	glutInitWindowSize(900, 900);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("Hello world :D");
-	glClear(GL_COLOR_BUFFER_BIT);
-	glBegin(GL_POLYGON);
-	glVertex3f(0.0, 0.0, 0.0);
-	glVertex3f(0.5, 0.0, 0.0);
-	glVertex3f(0.5, 0.5, 0.0);
-	glVertex3f(0.0, 0.5, 0.0);
-	glEnd();
-	glFlush();
-//	    glutDisplayFunc();
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glGenBuffers(1, &m_posVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_posVBO);  // coordinates
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pModel->verts.size(), nullptr, GL_STATIC_DRAW);
+	glVertexPointer(pModel->verts.size(), GL_FLOAT, 0, 0);
+
+	glGenBuffers(1, &m_colorVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);  // coordinates
+	glBufferData(GL_ARRAY_BUFFER, sizeof(uint8_t) * pModel->colors.size(), nullptr, GL_STATIC_DRAW);
+	glColorPointer(pModel->colors.size(), GL_BYTE, 0, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, pModel->faces.size()*3);
+
 	glutMainLoop();
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+
+	// Disable the VBO
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+void Initialize_VAO(Model* pModel)
+{
+	/*glGenVertexArrays(1, &(pModel->m_VAO));
+	glBindVertexArray(pModel->m_VAO);*/
+
 }

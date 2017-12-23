@@ -34,11 +34,10 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.495498152" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.726970299" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
-								<option id="gnu.cpp.link.option.paths.41467301" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
-									<listOptionValue builtIn="false" value="/usr/lib64"/>
-								</option>
+								<option id="gnu.cpp.link.option.paths.41467301" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths"/>
 								<option id="gnu.cpp.link.option.libs.1829839625" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="glut"/>
+									<listOptionValue builtIn="false" value="GLEW"/>
 									<listOptionValue builtIn="false" value="GL"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.52710267" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
