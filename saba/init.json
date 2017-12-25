@@ -1,0 +1,14 @@
+{
+    "MSAAEnable":	true,
+    "MSAACount":	8,
+    "Commands":[
+        {
+            "Cmd":"open",
+            "Args":["test.pmx"]
+        },
+        {
+            "Cmd":"open",
+            "Args":["test.vmd"]
+        }
+    ]
+}

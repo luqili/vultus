@@ -11,11 +11,115 @@
 using namespace std;
 using namespace tinyply;
 
+vector<float> computeNormals(glm::vec3 x, glm::vec3 y, glm::vec3 z){
+	vector<float> normalVec;
+
+	float s[3], t[3], v[3], length;
+	// Finding Vectors
+			s[0] = y.x - x.x;
+			s[1] = y.y - x.y;
+			s[2] = y.z - x.z;
+
+			t[0] = z.x - x.x;
+			t[1] = z.y - x.y;
+			t[2] = z.z - x.z;
+
+	// Cross Product
+	v[0] = s[1] * t[2] - t[1] * s[2];
+	v[1] = s[2] * t[0] - t[2] * s[0];
+	v[2] = s[0] * t[1] - t[0] * s[1];
+
+	// Normalization Factor
+//	length = sqrt( ( v[0] * v[0] ) + (v[1] * v[1]) + (v[2] * v[2]) );
+
+//	normalVec.push_back(v[0] / length);
+//	normalVec.push_back(v[1] / length);
+//	normalVec.push_back(v[2] / length);
+	normalVec.push_back(v[0]);
+	normalVec.push_back(v[1]);
+	normalVec.push_back(v[2]);
+	cout<<v[0]<<" "<<v[1]<<" "<<v[2]<<endl;
+	return normalVec;
+}
+
+
+
+
+
 int main() {
 	cout << "start reading ply file" << endl; // prints !!!Hello World!!!
 	Model* pModel = new Model();
-	read_ply_file("demo1.ply", pModel);
+	read_ply_file("pyramid.ply", pModel);
 	cout << "read complete" << endl;
+	vector<float> vertexNorm(pModel->verts.size(), 0);
+
+	for (int i = 0; i< (pModel->faces.size()/3); i++){
+	//	for (int i = 0; i< 30; i++){
+	//		cout << pModel->faces[i] << endl;
+	//		uint32_t pModel->faces[i];
+			uint32_t currentVertex = pModel->faces[3*i];
+			glm::vec3 x = glm::vec3(pModel->verts[3*currentVertex],pModel->verts[3*currentVertex+1],pModel->verts[3*currentVertex+2]);
+	//		cout << pModel->verts[pModel->faces[3*i]]<<pModel->verts[pModel->faces[3*i+1]]<<pModel->verts[pModel->faces[3*i+2]] <<endl;
+			//If needs to treat other shapes that are not triangle, need to read first column and change code
+			currentVertex = pModel->faces[3*i+1];
+			glm::vec3 y = glm::vec3(pModel->verts[3*currentVertex],pModel->verts[3*currentVertex+1],pModel->verts[3*currentVertex+2]);
+			currentVertex = pModel->faces[3*i+2];
+			glm::vec3 z = glm::vec3(pModel->verts[3*currentVertex],pModel->verts[3*currentVertex+1],pModel->verts[3*currentVertex+2]);
+	//		cout << x.x << " next is " << x.y << x.z <<endl;
+	//		cout << y.x << " next is " << y.y << y.z <<endl;
+	//		cout << z.x << " next is " << z.y << z.z <<endl;
+			vector<float> normVec = computeNormals(x,y,z);
+			pModel->norms.insert(pModel->norms.end(),normVec.begin(),normVec.end());
+	//		cout<< "Normal="<< pModel->norms[i]<<endl;
+			vertexNorm[3*pModel->faces[3*i]] +=  normVec[0];
+			vertexNorm[3*pModel->faces[3*i]+1] +=  normVec[1];
+			vertexNorm[3*pModel->faces[3*i]+2] +=  normVec[2];
+			//cout<< "Normal="<< vertexNorm[3*pModel->faces[3*i]]<<"Normal="<< vertexNorm[3*pModel->faces[3*i]+1] << "Normal="<< vertexNorm[3*pModel->faces[3*i]+2]<<endl;
+			float length = sqrt(
+					(vertexNorm[3*pModel->faces[3*i]] * vertexNorm[3*pModel->faces[3*i]] )
+					+ (vertexNorm[3*pModel->faces[3*i]+1] * vertexNorm[3*pModel->faces[3*i]+1])
+					+ (vertexNorm[3*pModel->faces[3*i]+2] * vertexNorm[3*pModel->faces[3*i]+2])
+					);
+//			vertexNorm[3*pModel->faces[3*i]] = vertexNorm[3*pModel->faces[3*i]]/length;
+//			vertexNorm[3*pModel->faces[3*i]+1] = vertexNorm[3*pModel->faces[3*i]+1]/length;
+//			vertexNorm[3*pModel->faces[3*i]+2] = vertexNorm[3*pModel->faces[3*i]+2]/length;
+//
+			vertexNorm[3*pModel->faces[3*i+1]] += normVec[0];
+			vertexNorm[3*pModel->faces[3*i+1]+1] += normVec[1];
+			vertexNorm[3*pModel->faces[3*i+1]+2] += normVec[2];
+
+//			uint32_t currentFace = pModel->faces[3*i+1];
+//			length = sqrt(
+//					(vertexNorm[3*currentFace] * vertexNorm[3*currentFace] )
+//					+ (vertexNorm[3*currentFace+1] * vertexNorm[3*currentFace+1])
+//					+ (vertexNorm[3*currentFace+2] * vertexNorm[3*currentFace+2])
+//					);
+//			vertexNorm[3*currentFace] = vertexNorm[3*currentFace]/length;
+//			vertexNorm[3*currentFace+1] = vertexNorm[3*currentFace+1]/length;
+//			vertexNorm[3*currentFace+2] = vertexNorm[3*currentFace+2]/length;
+
+			vertexNorm[3*pModel->faces[3*i+2]] += normVec[0];
+			vertexNorm[3*pModel->faces[3*i+2]+1] += normVec[1];
+			vertexNorm[3*pModel->faces[3*i+2]+2] += normVec[2];
+
+//			currentFace = pModel->faces[3*i+2];
+//			length = sqrt(
+//					(vertexNorm[3*currentFace] * vertexNorm[3*currentFace] )
+//					+ (vertexNorm[3*currentFace+1] * vertexNorm[3*currentFace+1])
+//					+ (vertexNorm[3*currentFace+2] * vertexNorm[3*currentFace+2])
+//					);
+//			vertexNorm[3*currentFace] = vertexNorm[3*currentFace]/length;
+//			vertexNorm[3*currentFace+1] = vertexNorm[3*currentFace+1]/length;
+//			vertexNorm[3*currentFace+2] = vertexNorm[3*currentFace+2]/length;
+		}
+	for(int i = 0; i<15;i++)
+		cout << vertexNorm[i] << endl;
+
+
+
+
+
+
 	display(pModel);
 	cout << "display complete" << endl;
 	delete pModel;
@@ -120,7 +224,7 @@ void read_ply_file(const std::string & filename, Model* pModel)
 
 void display(Model* pModel){
 
-	glewInit();
+	/*glewInit();
 	char *argv [1];
 	int argc=1;
 	argv [0]=strdup ("FaceRig");
@@ -145,13 +249,14 @@ void display(Model* pModel){
 
 	glDrawArrays(GL_TRIANGLES, 0, pModel->faces.size()*3);
 
+
 	glutMainLoop();
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 
 	// Disable the VBO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);*/
 }
 
 
