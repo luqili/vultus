@@ -16,6 +16,7 @@
 #include <tiny_obj_loader.h>
 
 using namespace tinyply;
+using namespace std;
 
 typedef std::chrono::time_point<std::chrono::high_resolution_clock> timepoint;
 std::chrono::high_resolution_clock c;
@@ -152,7 +153,7 @@ namespace saba
 
 		ss.close();
 
-		vertexCount = vertexCount / 3;
+		//vertexCount = vertexCount / 3;
 
 /*********************************************************************************************************/
 		SABA_INFO("Open OBJ file. {}", filepath);
@@ -163,8 +164,56 @@ namespace saba
 
 		// Meshを作成
 		m_positions.resize(vertexCount);
-		m_normals.resize(0);
+		m_normals.resize(vertexCount);
 		m_uvs.resize(0);
+
+//////////////////////////////CALCULATE NORMAL///////////////////////////////////////////////
+
+
+		vector<float> vertexNorm(vertexCount*3, 0);
+		//cout<<"start "<<vertexCount<<"   "<<vertexNorm[3]<< endl;
+
+		//cout << "Face Normals: "<< endl;
+		// Loop through each face and calculate face normal, i = row # of faces starting from 0
+		// could optimize it, Xian is good at it.
+		uint32_t Vertex_1, Vertex_2, Vertex_3;
+		glm::vec3 Vertext_1_Coord, Vertext_2_Coord, Vertext_3_Coord;
+		for (int i = 0; i< faceCount; i++){
+			uint32_t Vertex_1 = faces[3*i];
+			Vertext_1_Coord = glm::vec3(verts[3*Vertex_1], verts[3*Vertex_1+1], verts[3*Vertex_1+2]);
+	//		cout << pModel->verts[pModel->faces[3*i]]<<pModel->verts[pModel->faces[3*i+1]]<<pModel->verts[pModel->faces[3*i+2]] <<endl;
+			//If needs to treat other shapes that are not triangle, need to read first column and change code
+			Vertex_2 = faces[3*i+1];
+			Vertext_2_Coord = glm::vec3(verts[3*Vertex_2], verts[3*Vertex_2+1], verts[3*Vertex_2+2]);
+			Vertex_3 = faces[3*i+2];
+			Vertext_3_Coord = glm::vec3(verts[3*Vertex_3], verts[3*Vertex_3+1], verts[3*Vertex_3+2]);
+
+			vector<float> normVec = PlyFile::computeNormals(Vertext_1_Coord, Vertext_2_Coord, Vertext_3_Coord);
+			//norms.insert(norms.end(),normVec.begin(),normVec.end());
+			//cout<< "Normal="<< vertexNorm[3*faces[3*i]]<<"Normal="<< vertexNorm[3*faces[3*i]+1] << "Normal="<< vertexNorm[3*faces[3*i]+2]<<endl;
+
+			vertexNorm[3*Vertex_1] += normVec[0];
+			vertexNorm[3*Vertex_1 +1] += normVec[1];
+			vertexNorm[3*Vertex_1 +2] += normVec[2];
+
+			vertexNorm[3*Vertex_2] += normVec[0];
+			vertexNorm[3*Vertex_2 +1] += normVec[1];
+			vertexNorm[3*Vertex_2 +2] += normVec[2];
+
+			vertexNorm[3*Vertex_3] += normVec[0];
+			vertexNorm[3*Vertex_3 +1] += normVec[1];
+			vertexNorm[3*Vertex_3 +2] += normVec[2];
+			//cout<<"number "<<vertexNorm[3]<< "normal vec:" << normVec[0]<< normVec[1]<< normVec[2]<<endl;
+
+		}
+		//cout<<"Vertex Normals: ";
+		//for (int i = 0; i < 15; i++){
+		//	cout<<" "<<vertexNorm[i];
+		//}
+		//cout<<" "<<endl;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////		
+
 
 		for (size_t posIdx = 0; posIdx < vertexCount; posIdx++)
 		{
@@ -172,6 +221,14 @@ namespace saba
 			m_positions[posIdx].y = verts[posIdx * 3 + 1];
 			m_positions[posIdx].z = verts[posIdx * 3 + 2];
 		}
+		for (size_t norIdx = 0; norIdx < vertexCount; norIdx++)
+		{
+			m_normals[norIdx].x = vertexNorm[norIdx * 3 + 0];
+			m_normals[norIdx].y = vertexNorm[norIdx * 3 + 1];
+			m_normals[norIdx].z = vertexNorm[norIdx * 3 + 2];
+		}
+
+		
 
 		if (!m_positions.empty())
 		{
@@ -190,10 +247,9 @@ namespace saba
 		}
 
 		int emptyMatIdx = -1;
-
+		std::cout<<"face count is "<< faceCount <<std::endl;
 			for (size_t faceIdx = 0; faceIdx < faceCount; faceIdx++)
 			{
-				printf("face count is %d\n", faceCount);
 				auto material = -1;
 
 				if (material == -1)
@@ -215,9 +271,9 @@ namespace saba
 				face.m_position[0] = faces[faceIdx * 3 + 0];
 				face.m_position[1] = faces[faceIdx * 3 + 1];
 				face.m_position[2] = faces[faceIdx * 3 + 2];
-				face.m_normal[0] = -1;
-				face.m_normal[1] = -1;
-				face.m_normal[2] = -1;
+				face.m_normal[0] = faces[faceIdx * 3 + 0];
+				face.m_normal[1] = faces[faceIdx * 3 + 1];
+				face.m_normal[2] = faces[faceIdx * 3 + 1];
 				face.m_uv[0] = -1;
 				face.m_uv[1] = -1;
 				face.m_uv[2] = -1;

@@ -18,6 +18,10 @@
 #include <memory>
 #include <functional>
 #include <cstring>
+#include <glm/glm.hpp>
+#include <math.h>
+
+using namespace std;
 
 namespace tinyply
 {
@@ -213,6 +217,7 @@ namespace tinyply
 
 		void read(std::istream & is);
 		void write(std::ostream & os, bool isBinary);
+		static vector<float> computeNormals(glm::vec3 x, glm::vec3 y, glm::vec3 z);
 
 		std::vector<PlyElement> & get_elements() { return elements; }
 

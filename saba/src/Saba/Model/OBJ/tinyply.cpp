@@ -357,3 +357,57 @@ void PlyFile::read_internal(std::istream & is)
     }
 }
 
+
+vector<float> PlyFile::computeNormals(glm::vec3 x, glm::vec3 y, glm::vec3 z){
+    vector<float> normalVec;
+
+    float s[3], t[3], v[3], length;
+    // Finding Vectors
+    // in this case s is xy and t is xz
+            s[0] = y.x - x.x;
+            s[1] = y.y - x.y;
+            s[2] = y.z - x.z;
+
+            t[0] = z.x - x.x;
+            t[1] = z.y - x.y;
+            t[2] = z.z - x.z;
+
+    // Cross Product
+    v[0] = s[1] * t[2] - t[1] * s[2];
+    v[1] = s[2] * t[0] - t[2] * s[0];
+    v[2] = s[0] * t[1] - t[0] * s[1];
+
+    // calculate the area A=1/2|AB||AC|sinθ xy xz is the distance
+    float xy = sqrt((x.x-y.x)*(x.x-y.x)+(x.y-y.y)*(x.y-y.y)+(x.z-y.z)*(x.z-y.z));
+    float xz = sqrt((x.x-z.x)*(x.x-z.x)+(x.y-z.y)*(x.y-z.y)+(x.z-z.z)*(x.z-z.z));
+
+    float theta = acos((s[0]*t[0] + s[1]*t[1] + s[2]*t[2])/(xy*xz));
+    float area = 0.5*xy*xz*sin(theta);
+
+    //cout<<"normal x: "<< v[0] <<" "<<v[1] <<" "<<v[2] <<endl;
+
+    v[0] = v[0]/area;
+    v[1] = v[1]/area;
+    v[2] = v[2]/area;
+
+    // Normalization Factor
+//  length = sqrt( ( v[0] * v[0] ) + (v[1] * v[1]) + (v[2] * v[2]) );
+
+//  normalVec.push_back(v[0] / length);
+//  normalVec.push_back(v[1] / length);
+//  normalVec.push_back(v[2] / length);
+    normalVec.push_back(v[0]);
+    normalVec.push_back(v[1]);
+    normalVec.push_back(v[2]);
+
+    
+
+
+    //cout<<"Face coordinate x: "<< x[0] <<" "<<x[1] <<" "<<x[2] <<endl;
+    //cout<<"y: "<< y[0] <<" "<<y[1] <<" "<<y[2] <<endl;
+    //cout<<"z: "<< z[0] <<" "<<z[1] <<" "<<z[2] <<endl;
+    //cout<<"Face area: "<< area <<endl;
+
+    return normalVec;
+}
+
