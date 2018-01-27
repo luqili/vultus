@@ -1,1 +1,0 @@
-/usr/bin/c++   -g   CMakeFiles/mmd2obj.dir/mmd2obj.cpp.o  -o mmd2obj -rdynamic src/libSaba.a -lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody -ldl -lpthread -lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody -ldl -lpthread 
