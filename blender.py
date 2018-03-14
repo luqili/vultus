@@ -30,6 +30,7 @@ obj = bpy.context.active_object
 mat = bpy.data.materials.new(name="Material")
 mat.use_vertex_color_paint = True
 obj.data.materials.append(mat)
+bpy.ops.object.shade_smooth()
 
 # Sets all objects to shadeless
 for m in bpy.data.materials:
