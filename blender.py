@@ -17,6 +17,10 @@ scene = bpy.data.scenes["Scene"]
 context = bpy.context
 pi = 3.14159265
 
+#Set background color to white
+bpy.data.worlds["World"].use_sky_paper = True
+bpy.data.worlds["World"].horizon_color = (1.0,1.0,1.0)
+
 # Sets imported object as the currently active object
 bpy.context.scene.objects.active = bpy.data.objects[objName]
 obj = bpy.context.active_object
